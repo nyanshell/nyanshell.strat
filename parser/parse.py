@@ -34,7 +34,7 @@ def get_note_name(freq):
     return note_name[n] + str(octave)
 
 
-def get_freq(sample, samplerate, tolerance=0.8):
+def get_freq(sample, samplerate, tolerance=0.95):
     win_s = 4096  # fft size
     hop_s = 512  # hop size
 
@@ -87,6 +87,7 @@ def save_samples(samples,
                  dynamics='mp',
                  backtrack_length=512,  # -512 to avoid boundary glitch
                  max_sample_seconds=4,
+                 dry_run=False
                  ):
 
     sample_cnt = Counter()
@@ -99,6 +100,8 @@ def save_samples(samples,
         sample_cnt[note_name] += 1
         # draw_graph(data[onsets[i]:max_end])
         click.echo(f'#{i} freq: {freq} note: {note_name} total sample {sample_cnt[note_name]}')
+        if dry_run:
+            continue
         if click.confirm('save to sample?'):
             wavfile.write(
                 os.path.join(
@@ -127,11 +130,12 @@ def draw_graph(sample, samplerate):
 @click.argument("save_path", type=str)
 @click.option("--open-string", type=str, default='E2')
 @click.option("--dynamics", type=str, default='mp')
-def cli(input_sample, save_path, open_string, dynamics):
+@click.option("--dry-run", type=bool, is_flag=True)
+def cli(input_sample, save_path, open_string, dynamics, dry_run):
     samplerate, data = wavfile.read(input_sample)
     onsets = detect_onsets(input_sample, samplerate)
     onsets.append(int(data.shape[0]))
-    save_samples(data, onsets, save_path, samplerate, open_string=open_string, dynamics=dynamics)
+    save_samples(data, onsets, save_path, samplerate, open_string=open_string, dynamics=dynamics, dry_run=dry_run)
 
 
 if __name__ == '__main__':

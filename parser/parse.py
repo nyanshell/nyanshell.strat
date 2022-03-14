@@ -125,11 +125,13 @@ def draw_graph(sample, samplerate):
 @click.command()
 @click.argument("input_sample", type=str)
 @click.argument("save_path", type=str)
-def cli(input_sample, save_path):
+@click.option("--open-string", type=str, default='E2')
+@click.option("--dynamics", type=str, default='mp')
+def cli(input_sample, save_path, open_string, dynamics):
     samplerate, data = wavfile.read(input_sample)
     onsets = detect_onsets(input_sample, samplerate)
     onsets.append(int(data.shape[0]))
-    save_samples(data, onsets, save_path, samplerate)
+    save_samples(data, onsets, save_path, samplerate, open_string=open_string, dynamics=dynamics)
 
 
 if __name__ == '__main__':

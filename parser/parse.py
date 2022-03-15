@@ -34,23 +34,25 @@ def get_note_name(freq):
     return note_name[n] + str(octave)
 
 
-def get_freq(sample, samplerate, tolerance=0.95):
+def get_freq(sample, samplerate, min_confidence=0.95):
     win_s = 4096  # fft size
     hop_s = 512  # hop size
 
     pitch_o = pitch("yin", win_s, hop_s, samplerate)
     pitch_o.set_unit("freq")
-    pitch_o.set_tolerance(tolerance)
+    pitch_o.set_tolerance(0.8)
 
     pitches = []
+    confidences = []
 
-    for i in range(0, sample.shape[0] - hop_s, hop_s):
+    for i in range(0, sample.shape[0] - hop_s + 1, hop_s):
         p = pitch_o(sample[i:i + hop_s])[0]
         confidence = pitch_o.get_confidence()
-        if confidence > tolerance:
+        if confidence >= min_confidence:
             pitches.append(p)
+            confidences.append(confidence)
 
-    return np.mean(pitches)
+    return np.mean(pitches), np.mean(confidences)
 
 
 def detect_onsets(wav_fname, samplerate):
@@ -87,7 +89,9 @@ def save_samples(samples,
                  dynamics='mp',
                  backtrack_length=512,  # -512 to avoid boundary glitch
                  max_sample_seconds=4,
-                 dry_run=False
+                 dry_run=False,
+                 freq_confidence=0.95,
+                 save_all=False
                  ):
 
     sample_cnt = Counter()
@@ -95,14 +99,14 @@ def save_samples(samples,
         start_pos = onsets[i] - backtrack_length
         max_end = min(onsets[i + 1], onsets[i] + int(samplerate * max_sample_seconds))
         sample = samples[start_pos:max_end]
-        freq = get_freq(sample[:, 0].astype(np.float32), samplerate)
+        freq, confidence = get_freq(sample[:, 0].astype(np.float32), samplerate, min_confidence=freq_confidence)
         note_name = get_note_name(freq)
         sample_cnt[note_name] += 1
         # draw_graph(data[onsets[i]:max_end])
-        click.echo(f'#{i} freq: {freq} note: {note_name} total sample {sample_cnt[note_name]}')
+        click.echo(f'#{i} freq: {freq} note: {note_name} length: {sample.shape[0] / samplerate} confidence: {confidence} total sample {sample_cnt[note_name]}')
         if dry_run:
             continue
-        if click.confirm('save to sample?'):
+        if save_all or click.confirm('save to sample?'):
             wavfile.write(
                 os.path.join(
                     save_path,
@@ -111,6 +115,7 @@ def save_samples(samples,
                 sample)
         else:
             sample_cnt[note_name] -= 1  # exclude sample
+    click.echo(f'total notes: {sum(sample_cnt.values())}')
 
 
 def draw_graph(sample, samplerate):
@@ -130,12 +135,24 @@ def draw_graph(sample, samplerate):
 @click.argument("save_path", type=str)
 @click.option("--open-string", type=str, default='E2')
 @click.option("--dynamics", type=str, default='mp')
+@click.option("--freq-confidence", type=float, default=0.95)
 @click.option("--dry-run", type=bool, is_flag=True)
-def cli(input_sample, save_path, open_string, dynamics, dry_run):
+@click.option("--yes", type=bool, is_flag=True)
+def cli(input_sample, save_path, open_string, dynamics, freq_confidence, dry_run, yes):
     samplerate, data = wavfile.read(input_sample)
     onsets = detect_onsets(input_sample, samplerate)
     onsets.append(int(data.shape[0]))
-    save_samples(data, onsets, save_path, samplerate, open_string=open_string, dynamics=dynamics, dry_run=dry_run)
+    save_samples(
+        data,
+        onsets,
+        save_path,
+        samplerate,
+        open_string=open_string,
+        dynamics=dynamics,
+        dry_run=dry_run,
+        freq_confidence=freq_confidence,
+        save_all=yes
+    )
 
 
 if __name__ == '__main__':

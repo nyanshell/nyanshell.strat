@@ -102,8 +102,9 @@ def save_samples(samples,
         freq, confidence = get_freq(sample[:, 0].astype(np.float32), samplerate, min_confidence=freq_confidence)
         note_name = get_note_name(freq)
         sample_cnt[note_name] += 1
-        # draw_graph(data[onsets[i]:max_end])
-        click.echo(f'#{i} freq: {freq} note: {note_name} length: {sample.shape[0] / samplerate} confidence: {confidence} total sample {sample_cnt[note_name]}')
+        click.echo(
+            f'''#{i} freq: {freq} note: {note_name} length: {sample.shape[0] / samplerate}
+ confidence: {confidence} total sample {sample_cnt[note_name]}''')
         if dry_run:
             continue
         if save_all or click.confirm('save to sample?'):

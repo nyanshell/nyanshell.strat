@@ -1,6 +1,7 @@
 '''
 Generate SFZ file from samples
 '''
+import os
 import os.path
 from collections import Counter, defaultdict
 

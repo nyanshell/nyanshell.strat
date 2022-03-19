@@ -20,3 +20,15 @@ A virtual electric guitar in [SFZ format](https://sfzformat.com/). Sound samples
 
 - Add samples in dynamics _mf_ and _f_ .
 - Add some common chords.
+
+## Recording Hardware
+
+| - | - |
+| --- | --- |
+| neck | ROASTED MAPLE STRATOCASTER® NECK, 22 JUMBO FRETS, 12" |
+| body | Fender® DELUXE SERIES STRATOCASTER® ALDER BODY - HSH ROUTING |
+| pickup | Fender Tex-Mex Strat |
+| string | Ernie Ball 3221 Regular Slinky Nickel Wound Electric Guitar Strings - .010-.046 |
+| picks | Jim Dunlop Nylon Guitar Picks, 0.38 mm |
+| audio interface | steinberg UR22C |
+| DAW | Ableton Live Lite 11 |

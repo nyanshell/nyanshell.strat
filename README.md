@@ -1,6 +1,8 @@
 # nyanshell.strat
 A virtual electric guitar in [SFZ format](https://sfzformat.com/). Sound samples from a customized Stratocaster American Deluxe.
 
+[Sound sample](https://soundcloud.com/gestalt-baklava-lur/fender-american-deluxesfizz-ievan-polkka?utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing)
+
 ## Use
 
 - Open your DAW, e.g., Ableton Live, Studio One, etc.

@@ -14,3 +14,7 @@ A virtual electric guitar in [SFZ format](https://sfzformat.com/). Sound samples
 * Run parser. e.g, to genrate samples from D string's wave file: ``` > python parser/parse.py <wav-file-of-d-string> samples/d_mp/ --open-string D --freq-confidence 0.95```
 * Run sfz generator: ```> BASE_PATH=<sample-folder> python parser/gen.py```
 
+## TODO
+
+- Add samples in dynamics _mf_ and _f_ .
+- Add some common chords.
